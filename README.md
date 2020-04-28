@@ -2,6 +2,10 @@
 
 Simple go script to add found subdomains (from Amass, bruteforced with Massdns, etc) to your Postgres database one uses for Findomain (credits to https://github.com/Edu4rdSHL/findomain for that great tool). 
 
+Download: 
+
+```git clone https://github.com/TheMMMdev/addSome```
+
 Setup: 
 
 ```
