@@ -14,7 +14,7 @@ const (
 	port     = 5432
 	user     = "<postgres username>"
 	password = "<postgres password>"
-	dbname   = "<name of database to compare">
+	dbname   = "<name of database to compare"
 )
 
 func main() {
@@ -48,31 +48,25 @@ func main() {
 
 	for scanner.Scan() {
 
-		selectStatement := "SELECT name FROM subdomains where name=$1"
-		var domain string
-
-		row := db.QueryRow(selectStatement, scanner.Text())
-		switch err := row.Scan(&domain); err {
-		case sql.ErrNoRows:
-			fmt.Printf("%s not found, inserting...\n", scanner.Text())
 			insertStatement := `
-			INSERT INTO subdomains (name) VALUES ($1)`
+			INSERT INTO subdomains (name) VALUES ($1) on conflict (name) do nothing`
 
-			_, err = db.Exec(insertStatement, scanner.Text())
+			id, err := db.Exec(insertStatement, scanner.Text())
+			rows, err := id.RowsAffected()
+			if err != nil {
+				fmt.Println(err)
+			}
 			if err != nil {
 				panic(err)
+			}
+			if rows != 0 {
+				fmt.Printf("%s added!\n", scanner.Text())
 			}
 
 			if err := scanner.Err(); err != nil {
 				panic(err)
 			}
 
-		case nil:
-			continue
-		default:
-			panic(err)
-
-		}
 	}
 
 }
